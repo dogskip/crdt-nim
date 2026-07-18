@@ -1,0 +1,17 @@
+# Nim 빌드 산출물
+nimcache/
+*.exe
+*.dll
+*.so
+*.dylib
+
+# 테스트/실행 결과물
+tests/test_all
+*.log
+
+# 에디터 부산물
+.vscode/
+.idea/
+*.swp
+*~
+.DS_Store
