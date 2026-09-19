@@ -4,7 +4,6 @@ on:
   push:
     branches: [main]
   pull_request:
-    branches: [main]
 
 jobs:
   test:
@@ -22,3 +21,24 @@ jobs:
         run: nimble refresh
       - name: 테스트 실행
         run: nimble test
+      - name: 소비자 검사
+        run: nimble e2e
+
+  demo:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Nim 설치
+        uses: jiro4989/setup-nim-action@v1
+        with:
+          nim-version: 'stable'
+      - name: Python 설정
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Playwright 설치
+        run: |
+          python3 -m pip install playwright
+          python3 -m playwright install --with-deps chromium
+      - name: 데모 화면 검사
+        run: nimble demo
