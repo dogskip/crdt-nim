@@ -82,20 +82,27 @@ CRDT 는 Shapiro 등이 2007 년에 제안했다. 상태 공간을 반격자(joi
 | `tests/test_ormap.nim` | 한 키에 여러 값, 관찰 기반 제거, 병합 뒤 ID 발급 |
 | `tests/test_vectorclock.nim` | tick, 인과 관계, 동시성, 병합 |
 | `tests/test_concept.nim` | `Crdt` 를 통과하는 일반 절차 하나로 다섯 타입 전부 |
+| `tests/test_convergence.nim` | 무작위 수렴 — 병합 규칙을 단언으로 적은 명세, 씨앗 고정 |
 
-## 설치와 테스트
+## 설치와 검사
 
 ```bash
 nimble install crdt
 ```
 
 ```bash
-nimble test
+nimble test    # 단위 검사, 무작위 수렴 검사, 개념 검사
+nimble e2e     # 패키지를 설치한 뒤 별도 프로젝트에서 사용
+nimble demo    # 데모 화면을 빌드하고 headless Chromium 으로 확인
 # 또는
 nim c -r tests/test_all.nim
 ```
 
-Nim 2.0 이상이 필요하다.
+Nim 2.0 이상이 필요하다. `nimble demo` 는 Python Playwright 도 필요하다
+(`pip install playwright && playwright install chromium`).
+
+`demo/` 는 라이브러리를 JavaScript 로 컴파일해, 2P-Set 복제본 둘이 병합 뒤
+수렴하는 모습을 보여 준다. 추가보다 먼저 도착한 제거도 함께 보여 준다.
 
 ## 보안 고려
 

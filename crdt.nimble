@@ -16,8 +16,13 @@ task test, "CRDT 단위 테스트 실행":
   # tests 디렉토리의 통합 테스트를 컴파일/실행한다.
   exec "nim c -r tests/test_all.nim"
 
+# 설치된 패키지를 별도 프로젝트에서 사용하는지 확인한다.
+task e2e, "소비자 관점 검사 실행":
+  exec "sh tests/e2e/run.sh"
+
 # 데모 화면을 JS 로 빌드하고 브라우저에서 확인한다.
 task demo, "데모 화면 빌드와 브라우저 검사":
   exec "sh demo/build.sh"
   exec "python3 demo/verify.py"
+
 

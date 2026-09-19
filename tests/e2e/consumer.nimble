@@ -1,0 +1,5 @@
+version       = "0.0.0"
+author        = "dogskip"
+description   = "설치된 crdt 패키지를 사용하는 소비자 검사용 프로젝트"
+license       = "MIT"
+requires "crdt"

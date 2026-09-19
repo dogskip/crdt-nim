@@ -83,20 +83,28 @@ Worked examples live in the test suite, which is compiled and run on every push:
 | `tests/test_ormap.nim` | multi-value keys, observed-remove, issuing IDs after a merge |
 | `tests/test_vectorclock.nim` | tick, causality, concurrency, merge |
 | `tests/test_concept.nim` | one generic procedure over all five types, through `Crdt` |
+| `tests/test_convergence.nim` | randomized convergence — the merge rules stated as assertions, on a fixed seed |
 
-## Install and test
+## Install and check
 
 ```bash
 nimble install crdt
 ```
 
 ```bash
-nimble test
+nimble test    # unit tests, randomized convergence, and the concept check
+nimble e2e     # installs the package, then uses it from a separate project
+nimble demo    # builds the browser demo, then checks it in headless Chromium
 # or
 nim c -r tests/test_all.nim
 ```
 
-Requires Nim 2.0 or newer.
+Requires Nim 2.0 or newer. `nimble demo` also needs Python Playwright
+(`pip install playwright && playwright install chromium`).
+
+The demo in `demo/` compiles the library to JavaScript and shows two 2P-Set
+replicas converging after a merge, including a removal that arrives before the
+add it removes.
 
 ## Security notes
 
