@@ -3,7 +3,7 @@
 
 import unittest
 import std/options
-import ../src/lwwset
+import ../src/crdt/lwwset
 
 suite "LWW-Set 기본 연산":
   test "추가 후 조회":
@@ -26,6 +26,11 @@ suite "LWW-Set 기본 연산":
     s.add("a", 20)
     let entry = s.getEntry("a")
     check entry.get().ts == 20
+
+  test "넣지 않은 원소는 조회되지 않는다":
+    let s = newLWWSet[string]()
+    check "ghost" notin s
+    check s.card == 0
 
 suite "LWW-Set 삭제/재추가":
   test "삭제 후 재추가 가능":

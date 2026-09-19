@@ -2,7 +2,7 @@
 ## 병합의 교환/결합/멱등 법칙을 검증한다.
 
 import unittest
-import ../src/gset
+import ../src/crdt/gset
 
 suite "GSet 기본 연산":
   test "빈 집합의 크기는 0":

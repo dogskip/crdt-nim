@@ -2,8 +2,8 @@
 ## 인과 관계 추적과 동시성 감지를 검증한다.
 
 import unittest
-import ../src/crdt
-import ../src/vectorclock
+import ../src/crdt/common
+import ../src/crdt/vectorclock
 
 suite "Vector Clock 기본 연산":
   test "tick 으로 카운터 증가":

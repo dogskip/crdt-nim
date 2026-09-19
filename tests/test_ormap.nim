@@ -2,8 +2,8 @@
 ## 삭제 후 재추가와 동시 갱신 안전성을 검증한다.
 
 import unittest
-import ../src/crdt
-import ../src/ormap
+import ../src/crdt/common
+import ../src/crdt/ormap
 
 suite "OR-Map 기본 연산":
   test "put 후 lookup":
@@ -63,9 +63,7 @@ suite "OR-Map 병합":
     let b = newORMap[string, int](newNodeId("B"))
     discard a.put("k", 1)
     discard b.put("k", 2)
-    let left = merge(a, b)
-    let right = merge(b, a)
-    check left.lookup("k").len == right.lookup("k").len
+    check merge(a, b) == merge(b, a)
 
   test "결합법칙":
     let a = newORMap[string, int](newNodeId("A")); discard a.put("k", 1)
@@ -86,3 +84,21 @@ suite "OR-Map 병합":
     let b = newORMap[string, int](newNodeId("B")); discard b.put("k", 2)
     a.mergeInto(b)
     check a.lookup("k").len == 2
+
+  test "병합 뒤 발급한 ID 가 버려진 ID 와 겹치지 않는다":
+    # 발급 순번을 이어받지 않으면 이미 tombstone 인 ID 를 다시 발급해 값이 사라진다.
+    let a = newORMap[string, int](newNodeId("A"))
+    discard a.put("k", 1)
+    a.remove("k")
+    let merged = merge(a, newORMap[string, int](newNodeId("A")))
+    discard merged.put("k", 2)
+    check merged.lookup("k") == @[2]
+
+  test "mergeInto 뒤 발급한 ID 가 버려진 ID 와 겹치지 않는다":
+    let a = newORMap[string, int](newNodeId("A"))
+    discard a.put("k", 1)
+    a.remove("k")
+    let b = newORMap[string, int](newNodeId("A"))
+    b.mergeInto(a)
+    discard b.put("k", 2)
+    check b.lookup("k") == @[2]

@@ -2,7 +2,7 @@
 ## 삭제 후 복구 불가 속성과 병합 멱등성을 검증한다.
 
 import unittest
-import ../src/twopset
+import ../src/crdt/twopset
 
 suite "2P-Set 기본 연산":
   test "추가 후 조회":
@@ -25,9 +25,13 @@ suite "2P-Set 기본 연산":
     s.add("a")  # tombstone 때문에 여전히 조회 안 됨
     check "a" notin s
 
-  test "존재하지 않는 원소 삭제 시 false":
+  test "존재하지 않는 원소도 제거 집합에 들어간다":
     let s = newTwoPSet[int]()
+    check s.remove(42) == true
     check s.remove(42) == false
+    # 제거 집합에 있으므로 나중에 추가해도 조회되지 않는다
+    s.add(42)
+    check 42 notin s
 
 suite "2P-Set 병합":
   test "교환법칙":
@@ -66,3 +70,16 @@ suite "2P-Set 병합":
     discard b.remove("k")
     let merged = merge(a, b)
     check "k" notin merged
+
+  test "관찰 전 제거도 병합 후에 유지":
+    # 추가를 받기 전에 제거한 노드가 있어도 병합 결과는 제거된 상태여야 한다.
+    let a = newTwoPSet[string]()
+    let b = newTwoPSet[string]()
+    a.add("x")
+    discard b.remove("x")
+    check "x" notin merge(a, b)
+
+  test "관찰 전 제거가 있어도 교환법칙 성립":
+    let a = newTwoPSet[string](); a.add("x")
+    let b = newTwoPSet[string](); discard b.remove("x")
+    check merge(a, b) == merge(b, a)

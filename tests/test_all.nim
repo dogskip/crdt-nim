@@ -6,6 +6,7 @@ import test_twopset
 import test_lwwset
 import test_ormap
 import test_vectorclock
+import test_concept
 
 when isMainModule:
   echo "CRDT 테스트 시작"
