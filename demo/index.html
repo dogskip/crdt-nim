@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>crdt-nim — 2P-Set 수렴 데모</title>
+<style>
+  :root { color-scheme: dark; }
+  body { margin: 0; padding: 2rem; background: #11151c; color: #e6edf3;
+         font: 15px/1.6 ui-monospace, SFMono-Regular, Menlo, monospace; }
+  h1 { font-size: 1.15rem; margin: 0 0 .5rem; }
+  p.lead { color: #9aa7b4; margin: 0 0 1.6rem; max-width: 66ch; }
+  .panels { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
+  section { border: 1px solid #2a3440; border-radius: 10px; padding: 1rem; background: #151b23; }
+  h2 { font-size: .9rem; margin: 0 0 .3rem; color: #9aa7b4; font-weight: 600; }
+  .state { min-height: 2rem; font-size: 1.15rem; color: #7ee2b8; letter-spacing: .06em; }
+  ul { list-style: none; margin: .9rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: .35rem; }
+  li { border: 1px solid #2a3440; border-radius: 8px; padding: .2rem .35rem .2rem .5rem; }
+  button { font: inherit; color: #e6edf3; background: #232c37; border: 1px solid #35414f;
+           border-radius: 6px; padding: .1rem .4rem; cursor: pointer; }
+  button:hover { background: #2d3947; }
+  .actions { display: flex; gap: .6rem; margin: 1.2rem 0 .8rem; }
+  .actions button { padding: .35rem .9rem; }
+  #verdict { font-size: 1rem; margin: 0; }
+  .same { color: #7ee2b8; }
+  .diff { color: #f0a35e; }
+</style>
+</head>
+<body>
+  <h1>crdt-nim — 2P-Set 수렴 데모</h1>
+  <p class="lead">복제본에 값을 넣거나 제거한 뒤 <strong>병합</strong>을 누르세요. 제거는
+  영구적이라, 추가를 받기 전에 제거한 값도 병합 뒤에 살아나지 않습니다.</p>
+
+  <div class="panels">
+    <section>
+      <h2>복제본 A</h2>
+      <div class="state" id="state-0">-</div>
+      <ul id="ops-0"></ul>
+    </section>
+    <section>
+      <h2>복제본 B</h2>
+      <div class="state" id="state-1">-</div>
+      <ul id="ops-1"></ul>
+    </section>
+    <section>
+      <h2>병합 결과</h2>
+      <div class="state" id="state-2">-</div>
+      <p class="lead" style="margin:.9rem 0 0;font-size:.78rem">병합을 눌러야 갱신됩니다</p>
+    </section>
+  </div>
+
+  <div class="actions">
+    <button id="merge">병합</button>
+    <button id="reset">다시 시작</button>
+  </div>
+  <p id="verdict">수렴: -</p>
+
+  <script src="demo.js"></script>
+  <script>
+    const VALUES = ["1", "2", "3", "4", "5"];
+
+    function act(replica, kind, value) {
+      if (kind === "add") {
+        demoAdd(replica, value);
+      } else {
+        demoRemove(replica, value);
+      }
+      render();
+    }
+
+    function build() {
+      for (const i of [0, 1]) {
+        const name = i === 0 ? "a" : "b";
+        const list = document.getElementById("ops-" + i);
+        for (const v of VALUES) {
+          const li = document.createElement("li");
+          li.append(v + " ");
+          for (const [label, kind] of [["+", "add"], ["−", "del"]]) {
+            const b = document.createElement("button");
+            b.textContent = label;
+            b.id = name + "-" + kind + "-" + v;
+            b.onclick = () => act(i, kind, v);
+            li.append(b);
+          }
+          list.append(li);
+        }
+      }
+    }
+
+    function render() {
+      const states = [0, 1, 2].map((i) => demoState(i));
+      states.forEach((s, i) => {
+        document.getElementById("state-" + i).textContent = s;
+      });
+      const same = states.every((s) => s === states[0]);
+      const verdict = document.getElementById("verdict");
+      verdict.textContent = "수렴: " + (same ? "같음" : "다름");
+      verdict.className = same ? "same" : "diff";
+    }
+
+    document.getElementById("merge").onclick = () => { demoMerge(); render(); };
+    document.getElementById("reset").onclick = () => { demoReset(); render(); };
+    build();
+    render();
+  </script>
+</body>
+</html>

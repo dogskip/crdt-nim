@@ -15,3 +15,8 @@ tests/test_all
 *.swp
 *~
 .DS_Store
+
+# demo
+demo/demo.js
+demo/demo.png
+
